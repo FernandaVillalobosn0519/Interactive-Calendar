@@ -1,0 +1,112 @@
+/*Importar fuentes "Fredoka" y "Poppins" de Google font*/
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap');
+
+/*Estilos generales para todos los elementos*/
+*{
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Fredoka', Verdana, sans-serif; 
+}
+body{
+    display: flex; 
+    background-color: #c0d185; 
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px; 
+    min-height: 100vh; 
+    
+}
+.wrapper{
+  width: 465px; 
+
+  background: #FEFAE0; 
+  border-radius: 15px; 
+  box-shadow: 0 15px 40px #A8B090; 
+}
+.wrapper header{
+  display: flex; 
+  align-items: center; 
+  padding: 30px 30px 15px;
+  justify-content: space-between; 
+}
+header .current-date{
+  color: #3f4236;
+  cursor: default; 
+  font-size: 1.45rem; 
+  font-weight: 450;
+}
+header .icons{
+  display: flex;
+}
+header .icons span{
+  height: 38px;
+  width: 38px;
+  margin: 0 1px;
+  cursor: pointer;
+  color: #8d9576;
+  text-align: center;
+  line-height: 38px;
+  font-size: 2rem;
+  user-select: none;
+  border-radius: 50%;
+  transition: 0.3s ;
+}
+header .icons span:hover{
+  color: #f9ffdf;
+  background: #CCD5AE;
+}
+.icons span:last-child{
+margin-right: -10px;
+}
+.calendar{
+  padding: 15px;
+}
+.calendar ul{
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  text-align: center;
+}
+.calendar li{
+  color: #4c523c;
+  width: calc(100% / 7);
+  font-size: 1.1rem;
+  cursor: default;
+}
+.calendar .weeks li{
+  font-weight: 500;
+}
+.calendar .days{
+  margin-bottom: 20px;
+}
+.calendar .days li{
+  z-index: 1;
+  cursor: pointer;
+  position: relative;
+  margin-top: 30px;
+  font-weight: 440;
+}
+.days li.inactive{
+  color: #8d9576;
+}
+.days li.active{
+  color: #f9ffdf;
+}
+.days li::before{
+  position: absolute;
+  content: "";
+  left: 50%;
+  top: 50%;
+  height: 40px;
+  width: 40px;
+  z-index: -1;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.days li.active::before{
+  background: #D4A373;
+}
+.days li:not(.active):hover::before{
+  background: #CCD5AE;
+}
