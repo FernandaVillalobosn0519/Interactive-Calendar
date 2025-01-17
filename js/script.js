@@ -1,30 +1,36 @@
-const daysTag = document.querySelector(".days"),
+const daysTag = document.querySelector(".days"), /*Selección de elementos del DOM*/
       currentDate = document.querySelector(".current-date"),
       prevNextIcon = document.querySelectorAll(".icons span");
 
+/*Inicialización de variables de fecha*/
 let date = new Date();
 let currentYear = date.getFullYear();
 let currentMonth = date.getMonth();
 
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+/*Función para generar y mostrar el calendario*/
 const renderCalendar = () => {
     let firstDayofMonth = new Date(currentYear, currentMonth, 1).getDay(), 
         lastDateofMonth = new Date(currentYear, currentMonth + 1, 0).getDate(), 
         lastDayofMonth = new Date(currentYear, currentMonth, lastDateofMonth).getDay(), 
         lastDateofLastMonth = new Date(currentYear, currentMonth, 0).getDate();
 
+    //Generando HTML
     let liTag = "";
 
+    //Días del mes anterior
     for (let i = firstDayofMonth; i > 0; i--) {
         liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
     }
 
+    //Días del mes actual
     for (let i = 1; i <= lastDateofMonth; i++) {
         let isToday = i === date.getDate() && currentMonth === new Date().getMonth() && currentYear === new Date().getFullYear() ? "active" : "";
         liTag += `<li class="${isToday}">${i}</li>`;
     }
 
+    //Días del mes sgt
     for (let i = lastDayofMonth; i < 6; i++) { 
         liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`;
     }

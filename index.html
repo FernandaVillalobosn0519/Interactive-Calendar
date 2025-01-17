@@ -1,34 +1,62 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Calendar</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
     <script src="js/script.js" defer></script>
 </head>
 <body>
-    <div class="wrapper">
-        <header>
-            <p class="current-date"></p>
-            <div class="icons">
-                <span id="prev" class="material-symbols-rounded">chevron_left</span>
-                <span id="next" class="material-symbols-rounded">chevron_right</span>
-            </div>
-        </header>
-        <div class="calendar">
-            <ul class="weeks">
-                <li>Sun</li>
-                <li>Mon</li>
-                <li>Tue</li>
-                <li>Wed</li>
-                <li>Thu</li>
-                <li>Fri</li>
-                <li>Sat</li>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <ul>
+                <li class="active">Dashboard</li>
+                <li>Tasks</li>
+                <li>Holidays</li>
+                <li>Share tasks</li> <!-- Consultar con Jesus funcionalidad -->
             </ul>
-            <ul class="days"></ul>
-        </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="header">
+                <button class="light">Light-mode</button>
+                <button class="dark">Dark-mode</button>
+            </div>
+            <div class="wrapper">
+                <header>
+                    <p class="current-date"></p>
+                    <div class="icons">
+                        <span id="prev" class="material-symbols-rounded">chevron_left</span>
+                        <span id="next" class="material-symbols-rounded">chevron_right</span>
+                    </div>
+                </header>
+                <div class="calendar">
+                    <ul class="weeks">
+                        <li>Sun</li>
+                        <li>Mon</li>
+                        <li>Tue</li>
+                        <li>Wed</li>
+                        <li>Thu</li>
+                        <li>Fri</li>
+                        <li>Sat</li>
+                    </ul>
+                    <ul class="days"></ul>
+                </div>
+            </div>
+            <div class="search">
+                <div class="icon">
+                    <input type="text" placeholder="Search your task - date">
+                    <button class="search-button"><span class="material-symbols-rounded">Search</span></button>
+                </div>
+                <div class="add">
+                    <input type="text" placeholder="Add task">
+                    <button class="add-button"><span class="material-symbols-rounded">Add</span></button>
+                </div>
+            </div>
+        </main>
     </div>
 </body>
 </html>
