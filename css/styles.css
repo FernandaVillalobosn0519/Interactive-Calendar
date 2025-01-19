@@ -1,11 +1,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root{
+    --base-color: #f8fedf;
+    --primary-color: #c0d185;
+    --secundary-color: #FEFAE0;
+    --tertiary-color: #8d9576;
+    --primary-text-color: #3f4236;
+    --secundary-text-color:#4c523c;
+    --primary-pointer-shadow-color: #a4b962;
+    --secundary-pointer-shadow-color: #CCD5AE;
+    --today-color: #D4A373;
+}
+
+.darkmode{
+    --base-color: #353839;
+    --primary-color: #1e1f1f;
+    --secundary-color: #424242;
+    --tertiary-color: #242424;
+    --primary-text-color: #f9ecec;
+    --secundary-text-color:#e7f9f9;
+    --primary-pointer-shadow-color: #5c5c5c;
+    --secundary-pointer-shadow-color: #686868;
+    --today-color: #a8a8a8;
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', Verdana, sans-serif;
+}
+
 body {
     margin: 0;
-    font-family: Verdana, sans-serif;
     display: flex;
     height: 100vh;
-    background-color: #f4f6f9;
-    color: #333;
+    background-color: var(--base-color);
 }
 
 .container {
@@ -17,8 +47,8 @@ body {
 /* Sidebar */
 .sidebar {
     width: 20%;
-    background-color: #c0d185;
-    color: #4c523c;
+    background-color:var(--primary-color);
+    color: var(--secundary-text-color);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -39,7 +69,7 @@ body {
 }
 
 .sidebar li.active, .sidebar li:hover {
-    background-color: #a4b962;
+    background-color: var(--primary-pointer-shadow-color);
 }
 
 /* Contenido principal */
@@ -59,31 +89,31 @@ body {
     margin-bottom: 2px;
 }
 
-.light .dark {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.light {
-    background-color: #FEFAE0;
-    color: #4c523c;
-    cursor: pointer; 
-}
-
-.dark {
-    background-color: #4c523c;
-    color: #FEFAE0;
-    cursor: pointer; 
-}
-
-/* Acciones para las tareas */
-.search {
+/*Cambio de color a dark mode*/
+#theme-switch{
+    height: 50px;
+    width: 50px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: var(--primary-color);
     display: flex;
-    flex-direction: column;
-    gap: px;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+}
+#theme-switch svg{
+    fill: var(--secundary-color);
+}
+#theme-switch svg:last-child{
+    display: none;
+}
+.darkmode #theme-switch svg:first-child{
+    display: none;
+}
+.darkmode #theme-switch svg:last-child{
+    display: block;
 }
 
 .icon, .add {
@@ -95,7 +125,7 @@ body {
 .icon input, .add input {
     flex: 1;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 2px solid var(--primary-color); 
     border-radius: 5px;
 }
 
@@ -103,23 +133,23 @@ body {
     padding: 4px 10px;
     border: none;
     border-radius: 4px;
-    background-color: #c0d185;
-    color: #FEFAE0;
+    background-color: var(--primary-color);
+    color: var(--base-color);
     font-size: 15px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.1s ease;
 }
 
 .search-button:hover, .add-button:hover {
-    background-color: #a4b962;
+    background-color: var(--primary-pointer-shadow-color);
 }
 
 /* Calendario */
 .wrapper { 
     width: 100%; 
-    background: #FEFAE0; 
+    background: var(--secundary-color); 
     border-radius: 15px; 
-    box-shadow: 0 15px 40px #A8B090; 
+    box-shadow: 0 15px 40px var(--tertiary-color);
     margin-top: 15px; 
 }
 
@@ -131,7 +161,7 @@ body {
 }
 
 .current-date { 
-    color: #3f4236; 
+    color: var(--primary-text-color);
     cursor: default; 
     font-size: 1.45rem; 
     font-weight: 450; 
@@ -145,18 +175,18 @@ body {
     height: 38px; width: 38px; 
     margin: 0 1px; 
     cursor: pointer; 
-    color: #8d9576; 
+    color: var(--tertiary-color); 
     text-align: center; 
     line-height: 38px; 
     font-size: 2rem; 
     user-select: none; 
     border-radius: 50%; 
-    transition: 0.3s; 
+    transition: 0.1s; 
 }
 
 .icons span:hover { 
-    color: #f9ffdf; 
-    background: #CCD5AE; 
+    color: var(--base-color); 
+    background: var(--secundary-pointer-shadow-color); 
 }
 
 .calendar { 
@@ -171,7 +201,7 @@ body {
 }
 
 .calendar li { 
-    color: #4c523c; 
+    color: var(--secundary-text-color); 
     width: calc(95% / 7); 
     font-size: 1.1rem; 
     cursor: default; 
@@ -194,11 +224,11 @@ body {
 }
 
 .days li.inactive { 
-    color: #8d9576; 
+    color: var(--tertiary-color); 
 }
 
 .days li.active { 
-    color: #f9ffdf; 
+    color: var(--base-color); 
 } 
 
 .days li::before { 
@@ -214,9 +244,9 @@ body {
 }
 
 .days li.active::before { 
-    background: #D4A373; 
+    background: var(--today-color); 
 } 
 
 .days li:not(.active):hover::before { 
-    background: #CCD5AE; 
+    background: var(--secundary-pointer-shadow-color); 
 }

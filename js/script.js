@@ -2,6 +2,27 @@ const daysTag = document.querySelector(".days"), /*Selección de elementos del D
       currentDate = document.querySelector(".current-date"),
       prevNextIcon = document.querySelectorAll(".icons span");
 
+      let darkmode = localStorage.getItem('darkmode');
+
+      const themeSwitch = document.getElementById('theme-switch');
+      
+      const enableDarkMode = () => {
+          document.body.classList.add('darkmode');
+          localStorage.setItem('darkmode', 'active');
+          }
+      
+      const disableDarkMode = () => {
+              document.body.classList.remove('darkmode');
+              localStorage.setItem('darkmode', null);
+          }
+      
+      if (darkmode === "active") enableDarkMode();  
+      
+      themeSwitch.addEventListener("click", () => {
+          darkmode = localStorage.getItem('darkmode');
+          darkmode !== "active" ? enableDarkMode() : disableDarkMode();
+          });      
+
 /*Inicialización de variables de fecha*/
 let date = new Date();
 let currentYear = date.getFullYear();
