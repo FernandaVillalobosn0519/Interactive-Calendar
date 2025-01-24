@@ -301,3 +301,58 @@ body {
 #delete-task-button:hover {
     background-color: #d32f2f;
 }
+
+/* Ocultar todas las secciones por defecto */
+.tab-content {
+    display: none;
+}
+
+/* Mostrar la sección activa */
+.tab-content.active {
+    display: block;
+}
+
+/* Mostrar el Dashboard por defecto */
+#dashboard {
+    display: block;
+}
+
+/* Estilo para días con eventos */
+.has-event {
+    text-decoration: underline;
+    text-decoration-color: red; /* Color de subrayado rojo */
+}
+
+#tasks-container {
+    max-height: 50vh; /* Ajusta el tamaño máximo del contenedor de tareas */
+    overflow-y: auto; 
+}
+
+#tasks-container > div {
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.delete-button {
+    float: right;
+    margin-left: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.delete-button:hover {
+    background-color: darkred;
+}
+
+.week-task {
+    background-color: #f0f0f0;
+    border-left: 4px solid #0078d4; /* Color de borde */
+    padding: 8px;
+    margin-bottom: 5px;
+}
