@@ -21,7 +21,7 @@ const daysTag = document.querySelector(".days"), /*Selección de elementos del D
       themeSwitch.addEventListener("click", () => {
           darkmode = localStorage.getItem('darkmode');
           darkmode !== "active" ? enableDarkMode() : disableDarkMode();
-          });      
+        });      
 
 /*Inicialización de variables de fecha*/
 let date = new Date();
@@ -37,27 +37,34 @@ const renderCalendar = () => {
         lastDayofMonth = new Date(currentYear, currentMonth, lastDateofMonth).getDay(), 
         lastDateofLastMonth = new Date(currentYear, currentMonth, 0).getDate();
 
-    //Generando HTML
     let liTag = "";
+    const savedTasks = JSON.parse(localStorage.getItem('calendarTasks')) || {}; // Cargar tareas guardadas
 
-    //Días del mes anterior
+    // Días del mes anterior
     for (let i = firstDayofMonth; i > 0; i--) {
-        liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
+        const day = lastDateofLastMonth - i + 1;
+        const dateKey = `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        liTag += `<li class="inactive ${savedTasks[dateKey] ? 'has-event' : ''}">${day}</li>`;
     }
 
-    //Días del mes actual
+    // Días del mes actual
     for (let i = 1; i <= lastDateofMonth; i++) {
-        let isToday = i === date.getDate() && currentMonth === new Date().getMonth() && currentYear === new Date().getFullYear() ? "active" : "";
-        liTag += `<li class="${isToday}">${i}</li>`;
+        const isToday = i === date.getDate() && currentMonth === new Date().getMonth() && currentYear === new Date().getFullYear() ? "active" : "";
+        const dateKey = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        liTag += `<li class="${isToday} ${savedTasks[dateKey] ? 'has-event' : ''}">${i}</li>`;
     }
 
-    //Días del mes sgt
-    for (let i = lastDayofMonth; i < 6; i++) { 
-        liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`;
+    // Días del mes siguiente
+    for (let i = lastDayofMonth; i < 6; i++) {
+        const day = i - lastDayofMonth + 1;
+        const dateKey = `${currentYear}-${String(currentMonth + 2).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        liTag += `<li class="inactive ${savedTasks[dateKey] ? 'has-event' : ''}">${day}</li>`;
     }
+
     currentDate.innerText = `${months[currentMonth]} ${currentYear}`;
     daysTag.innerHTML = liTag;
-}
+};
+
 renderCalendar();
 
 prevNextIcon.forEach(icon => { 
@@ -73,4 +80,322 @@ prevNextIcon.forEach(icon => {
         }
         renderCalendar(); 
     });
+});
+
+/* Añadir evento al calendario loco. */
+
+document.addEventListener('DOMContentLoaded', () => {
+    const daysContainer = document.querySelector('.days');
+    const taskInput = document.querySelector('.add input');
+    const addTaskButton = document.querySelector('.add button');
+    const currentDateElement = document.querySelector('.current-date');
+    const eventTimeInput = document.querySelector('#dashboard #event-time');
+    const eventDescriptionInput = document.querySelector('#dashboard #event-description');
+    let selectedDay = null;
+
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+
+    const savedTasks = JSON.parse(localStorage.getItem('calendarTasks')) || {};
+
+    // Obtener el mes y año actualmente mostrados en el calendario
+    const getDisplayedMonthAndYear = () => {
+        const [monthName, year] = currentDateElement.textContent.split(' ');
+        const displayedMonth = new Date(`${monthName} 1, ${year}`).getMonth();
+        const displayedYear = parseInt(year);
+        return { displayedMonth, displayedYear };
+    };
+
+    // Deshabilitar fehcas pasadass.
+    const disablePastDays = () => {
+        const dayElements = daysContainer.querySelectorAll('li');
+        const { displayedMonth, displayedYear } = getDisplayedMonthAndYear();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+    
+        const savedTasks = JSON.parse(localStorage.getItem('calendarTasks')) || {};
+    
+        dayElements.forEach((dayElement) => {
+            const day = parseInt(dayElement.textContent);
+            if (!day || isNaN(day)) return; 
+    
+            const isInactive = dayElement.classList.contains('inactive');
+            let date;
+    
+            if (isInactive && day > 15) { 
+                date = new Date(displayedYear, displayedMonth - 1, day);
+            } else if (isInactive && day <= 15) { 
+                date = new Date(displayedYear, displayedMonth + 1, day);
+            } else { 
+                date = new Date(displayedYear, displayedMonth, day);
+            }
+    
+            date.setHours(0, 0, 0, 0);
+    
+            if (date < today) {
+                dayElement.classList.add('disabled');
+                dayElement.style.pointerEvents = 'none';
+                dayElement.style.color = '#ccc';
+            } else {
+                dayElement.classList.remove('disabled');
+                dayElement.style.pointerEvents = 'auto';
+                dayElement.style.color = '';
+            }
+    
+            const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            
+            if (savedTasks[dateKey]) {
+                dayElement.classList.add('has-event');
+            } else {
+                dayElement.classList.remove('has-event'); // Quitar la clase si no hay eventos
+            }
+        });
+    };
+    
+
+
+    // Añadir tarea al día seleccionado
+    addTaskButton.addEventListener('click', () => {
+        if (!selectedDay) {
+            alert('Please select a day.');
+            return;
+        }
+        const task = taskInput.value.trim();
+        const eventTime = eventTimeInput.value;
+        const eventDescription = eventDescriptionInput.value.trim();
+        
+        if (!task || !eventTime || !eventDescription) {
+            alert('Please fill in all fields.');
+            return;
+        }
+    
+        const day = parseInt(selectedDay.textContent);
+        const { displayedMonth, displayedYear } = getDisplayedMonthAndYear();
+        const formattedMonth = String(displayedMonth + 1).padStart(2, '0');
+        const dateKey = `${displayedYear}-${formattedMonth}-${String(day).padStart(2, '0')}`;
+    
+        const savedTasks = JSON.parse(localStorage.getItem('calendarTasks')) || {};
+        if (!savedTasks[dateKey]) {
+            savedTasks[dateKey] = [];
+        }
+        savedTasks[dateKey].push(`${task} at ${eventTime} - ${eventDescription}`);
+        localStorage.setItem('calendarTasks', JSON.stringify(savedTasks));
+    
+        // renderiza el calendario para reflejar los cambios.
+        renderCalendar();
+        disablePastDays();
+    
+        taskInput.value = '';
+        eventTimeInput.value = '';
+        eventDescriptionInput.value = '';
+    });
+    
+
+
+    const observer = new MutationObserver(() => {
+        disablePastDays();
+    });
+
+    observer.observe(daysContainer, { childList: true });
+
+
+    disablePastDays();
+});
+
+
+
+/*Buscando las tareas- no gunciona aún pero tratamos.
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.querySelector('.search input[type="text"]');
+    const searchButton = document.querySelector('.search-button');
+    const daysContainer = document.querySelector('.days');
+    const currentDateElement = document.querySelector('.current-date');
+
+
+    // mes y año actual.
+    const getDisplayedMonthAndYear = () => {
+        const [monthName, year] = currentDateElement.textContent.split(' ');
+        const displayedMonth = new Date(`${monthName} 1, ${year}`).getMonth();
+        const displayedYear = parseInt(year);
+        return { displayedMonth, displayedYear };
+    };
+
+    // palabra clave.
+    const searchTasks = () => {
+        const query = searchInput.value.trim().toLowerCase();
+        if (!query) {
+            alert('Please enter a date (YYYY-MM-DD) or a keyword to search.');
+            return;
+        }
+
+        const { displayedMonth, displayedYear } = getDisplayedMonthAndYear();
+
+        // Si la consulta es una fecha en formato YYYY-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}$/.test(query)) {
+            const [year, month, day] = query.split('-').map(Number);
+
+
+            if (year === displayedYear && month - 1 === displayedMonth) {
+                const dayElement = [...daysContainer.querySelectorAll('li')].find(
+                    (li) => parseInt(li.textContent) === day
+                );
+
+                if (dayElement) {
+                    daysContainer.querySelectorAll('li').forEach((li) => li.classList.remove('highlight'));
+                    dayElement.classList.add('highlight');
+                    dayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    alert('No tasks found for the specified date.');
+                }
+            } else {
+                alert('The date is not in the current calendar view.');
+            }
+        } else {
+            const dayElements = daysContainer.querySelectorAll('li');
+            let found = false;
+
+            dayElements.forEach((dayElement) => {
+                const tasks = [...dayElement.querySelectorAll('.task')];
+                tasks.forEach((task) => {
+                    if (task.textContent.toLowerCase().includes(query)) {
+                        dayElement.classList.add('highlight');
+                        found = true;
+                    }
+                });
+            });
+
+            if (!found) {
+                alert('No tasks found matching the keyword.');
+            }
+        }
+    };
+
+    // clic bsuqeuda.
+    searchButton.addEventListener('click', searchTasks);
+
+    const observer = new MutationObserver(() => {
+        daysContainer.querySelectorAll('li').forEach((li) => li.classList.remove('highlight'));
+    });
+
+    observer.observe(daysContainer, { childList: true });
+});*/
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('.sidebar .tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+//selecciona el día.
+    const getCurrentWeek = () => {
+        const today = new Date();
+        const firstDayOfWeek = today.getDate() - today.getDay(); // Get the first day of the week (Sunday)
+        const lastDayOfWeek = firstDayOfWeek + 6; // Get the last day of the week (Saturday)
+    
+        const firstDate = new Date(today.setDate(firstDayOfWeek));
+        const lastDate = new Date(today.setDate(lastDayOfWeek));
+    
+        return { firstDate, lastDate };
+    };
+
+    const loadTasks = () => {
+        const tasksContainer = document.getElementById('tasks-container');
+        const savedTasks = JSON.parse(localStorage.getItem('calendarTasks')) || {};
+        const { firstDate, lastDate } = getCurrentWeek(); 
+        tasksContainer.innerHTML = ''; // Limpiar tareas actuales
+
+        Object.keys(savedTasks).forEach(dateKey => {
+            const tasks = savedTasks[dateKey];
+            const [year, month, day] = dateKey.split('-').map(Number);
+            const taskDate = new Date(year, month - 1, day);
+
+            tasks.forEach((task, index) => {
+                const taskElement = document.createElement('div');
+                taskElement.textContent = `${dateKey}: ${task}`;
+                // Crear botón de eliminar
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'delete-button';
+                deleteButton.onclick = () => {
+                    if (confirm(`Are you sure you want to delete this task: "${task}"?`)) {
+                        deleteTask(dateKey, index);
+                    }
+                };
+                
+                taskElement.appendChild(deleteButton);
+
+                // Destacar las tareas de la semana actual
+                if (taskDate >= firstDate && taskDate <= lastDate) {
+                    taskElement.classList.add('week-task');
+                    tasksContainer.insertBefore(taskElement, tasksContainer.firstChild); // Insertar al principio
+                } else {
+                    tasksContainer.appendChild(taskElement);
+                }
+            });
+        });
+    };
+
+    
+
+    const deleteTask = (dateKey, taskIndex) => {
+        const savedTasks = JSON.parse(localStorage.getItem('calendarTasks')) || {};
+        savedTasks[dateKey].splice(taskIndex, 1); // Eliminar tarea
+    
+        // Si no quedan tareas para esa fecha, eliminarla del objeto y actualizar el calendario
+        if (savedTasks[dateKey].length === 0) {
+            delete savedTasks[dateKey]; // Eliminar la fecha del objeto
+            
+            // Actualizar visualmente el día en el calendario
+            const [year, month, day] = dateKey.split('-').map(Number);
+            const dayElements = document.querySelectorAll('.days li');
+    
+            dayElements.forEach(dayElement => {
+                if (!dayElement.classList.contains('inactive') && parseInt(dayElement.textContent) === day) {
+                    dayElement.classList.remove('has-event'); // Quitar subrayado
+                }
+            });
+        }
+    
+        // Guardar los cambios en localStorage y recargar las tareas
+        localStorage.setItem('calendarTasks', JSON.stringify(savedTasks));
+        loadTasks(); // Recargar tareas visibles en la pestaña de tareas
+        disablePastDays(); // Actualizar las clases de los días en el calendario
+    };
+    
+    // Función para mostrar tareas disponibles para eliminar y devolver índice de la seleccionada
+    function promptTasksForDeletion(tasks) {
+        const taskList = tasks
+            .map((task, index) => `${index + 1}. ${task}`)
+            .join("\n");
+        const taskIndex = prompt(`Select a task to delete:\n\n${taskList}`);
+        if (taskIndex && !isNaN(taskIndex) && taskIndex > 0 && taskIndex <= tasks.length) {
+            return parseInt(taskIndex, 10) - 1; // Convertir a índice basado en cero
+        }
+        return null;
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', (event) => {
+            // Ocultar todas las secciones
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                content.style.display = 'none';
+            });
+
+            // Mostrar la sección correspondiente
+            const tabName = event.target.getAttribute('data-tab');
+            const tabContent = document.getElementById(tabName);
+            tabContent.classList.add('active');
+            tabContent.style.display = 'block';
+
+            // Ejecutar acciones específicas para la pestaña "Tasks"
+            if (tabName === 'tasks') {
+                loadTasks();
+            }
+        });
+    });
+
+    // Asegurarse de que la sección Dashboard se muestre inicialmente
+    document.getElementById('dashboard').classList.add('active');
+    disablePastDays();
 });

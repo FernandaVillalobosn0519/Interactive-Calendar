@@ -250,3 +250,109 @@ body {
 .days li:not(.active):hover::before { 
     background: var(--secundary-pointer-shadow-color); 
 }
+
+/* Día seleccionado */
+.days .selected {
+    background-color: #f0f8ff;
+    border: 2px solid #1e90ff;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+/* Estilo de las tareas */
+.task {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f0f8ff;
+    padding: 5px 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: #1e90ff;
+}
+
+.task .delete-task {
+    background-color: #ff4d4d;
+    border: none;
+    color: white;
+    padding: 3px 7px;
+    font-size: 0.8rem;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.task .delete-task:hover {
+    background-color: #e60000;
+}
+
+
+#delete-task-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+#delete-task-button:hover {
+    background-color: #d32f2f;
+}
+
+/* Ocultar todas las secciones por defecto */
+.tab-content {
+    display: none;
+}
+
+/* Mostrar la sección activa */
+.tab-content.active {
+    display: block;
+}
+
+/* Mostrar el Dashboard por defecto */
+#dashboard {
+    display: block;
+}
+
+/* Estilo para días con eventos */
+.has-event {
+    text-decoration: underline;
+    text-decoration-color: red; /* Color de subrayado rojo */
+}
+
+#tasks-container {
+    max-height: 50vh; /* Ajusta el tamaño máximo del contenedor de tareas */
+    overflow-y: auto; 
+}
+
+#tasks-container > div {
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.delete-button {
+    float: right;
+    margin-left: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.delete-button:hover {
+    background-color: darkred;
+}
+
+.week-task {
+    background-color: #f0f0f0;
+    border-left: 4px solid #0078d4; /* Color de borde */
+    padding: 8px;
+    margin-bottom: 5px;
+}
