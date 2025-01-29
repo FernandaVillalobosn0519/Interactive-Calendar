@@ -23,7 +23,7 @@ const daysTag = document.querySelector(".days"), /*Selección de elementos del D
           darkmode !== "active" ? enableDarkMode() : disableDarkMode();
         });      
 
-/*Inicialización de variables de fecha*/
+//---------------Inicialización de variables de fecha
 let date = new Date();
 let currentYear = date.getFullYear();
 let currentMonth = date.getMonth();
@@ -83,7 +83,6 @@ prevNextIcon.forEach(icon => {
 });
 
 /* Añadir evento al calendario loco. */
-
 document.addEventListener('DOMContentLoaded', () => {
     const daysContainer = document.querySelector('.days');
     const taskInput = document.querySelector('.add input');
@@ -142,7 +141,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 dayElement.style.pointerEvents = 'auto';
                 dayElement.style.color = '';
             }
-    
+
+             // Deshabilitar los días fuera del mes actual
+             const isNextMonth = date.getMonth() !== displayedMonth;
+             if (isNextMonth) {
+                 dayElement.classList.add('disabled');
+                 dayElement.style.pointerEvents = 'none';
+                 dayElement.style.color = '#ccc';
+             }
+ 
             const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             
             if (savedTasks[dateKey]) {
@@ -153,7 +160,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
     
-
+    // selecciona día del calendario
+    daysContainer.addEventListener('click', (event) => {
+        const target = event.target.closest('li'); 
+        if (target && !target.classList.contains('disabled')) {
+            if (selectedDay) selectedDay.classList.remove('selected');
+            selectedDay = target;
+            selectedDay.classList.add('selected');
+        }
+    });
 
     // Añadir tarea al día seleccionado
     addTaskButton.addEventListener('click', () => {
@@ -191,211 +206,241 @@ document.addEventListener('DOMContentLoaded', () => {
         eventDescriptionInput.value = '';
     });
     
-
-
     const observer = new MutationObserver(() => {
         disablePastDays();
     });
 
     observer.observe(daysContainer, { childList: true });
-
-
     disablePastDays();
 });
 
+//---------------Añadimos los feriados--------------------
+const getHolidays = async () => {
+    const apiKey = 'gxtebsMEUnth8jqb7t6ZcsApKxo2L5G9'; // codigo API 
+    const country = 'PE';
+    const year = 2025;
 
+    const url = `https://calendarific.com/api/v2/holidays?api_key=${apiKey}&country=${country}&year=${year}`;
 
-/*Buscando las tareas- no gunciona aún pero tratamos.
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.querySelector('.search input[type="text"]');
-    const searchButton = document.querySelector('.search-button');
-    const daysContainer = document.querySelector('.days');
-    const currentDateElement = document.querySelector('.current-date');
-
-
-    // mes y año actual.
-    const getDisplayedMonthAndYear = () => {
-        const [monthName, year] = currentDateElement.textContent.split(' ');
-        const displayedMonth = new Date(`${monthName} 1, ${year}`).getMonth();
-        const displayedYear = parseInt(year);
-        return { displayedMonth, displayedYear };
-    };
-
-    // palabra clave.
-    const searchTasks = () => {
-        const query = searchInput.value.trim().toLowerCase();
-        if (!query) {
-            alert('Please enter a date (YYYY-MM-DD) or a keyword to search.');
-            return;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Error de red: ${response.status}`);
         }
+        const data = await response.json();
 
-        const { displayedMonth, displayedYear } = getDisplayedMonthAndYear();
-
-        // Si la consulta es una fecha en formato YYYY-MM-DD
-        if (/^\d{4}-\d{2}-\d{2}$/.test(query)) {
-            const [year, month, day] = query.split('-').map(Number);
-
-
-            if (year === displayedYear && month - 1 === displayedMonth) {
-                const dayElement = [...daysContainer.querySelectorAll('li')].find(
-                    (li) => parseInt(li.textContent) === day
-                );
-
-                if (dayElement) {
-                    daysContainer.querySelectorAll('li').forEach((li) => li.classList.remove('highlight'));
-                    dayElement.classList.add('highlight');
-                    dayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                    alert('No tasks found for the specified date.');
-                }
-            } else {
-                alert('The date is not in the current calendar view.');
-            }
+        if (data.response && data.response.holidays) {
+            // Convertir las fechas y retornar los feriados
+            return data.response.holidays.map(holiday => ({
+                date: new Date(holiday.date.iso), // Convertir a objeto Date
+                name: holiday.name
+            }));
         } else {
-            const dayElements = daysContainer.querySelectorAll('li');
-            let found = false;
-
-            dayElements.forEach((dayElement) => {
-                const tasks = [...dayElement.querySelectorAll('.task')];
-                tasks.forEach((task) => {
-                    if (task.textContent.toLowerCase().includes(query)) {
-                        dayElement.classList.add('highlight');
-                        found = true;
-                    }
-                });
-            });
-
-            if (!found) {
-                alert('No tasks found matching the keyword.');
-            }
+            throw new Error('Formato de respuesta inesperado');
         }
-    };
+    } catch (error) {
+        console.error('Error al obtener los días festivos:', error);
+        return [];
+    }
+};
 
-    // clic bsuqeuda.
-    searchButton.addEventListener('click', searchTasks);
+// Función para obtener el mes y año locales de una fecha usando ISO para evitar modificaciones de zona horaria
+const getLocalMonthYear = (date) => {
+    const isoDate = date.toISOString().split('T')[0]; //AAAA-MM-DD
+    const [year, month] = isoDate.split('-');
+    return `${year}-${month}`;
+};
 
-    const observer = new MutationObserver(() => {
-        daysContainer.querySelectorAll('li').forEach((li) => li.classList.remove('highlight'));
+// Función para agrupar los feriados por mes
+const groupHolidaysByMonth = (holidays) => {
+    return holidays.reduce((acc, holiday) => {
+        const monthYear = getLocalMonthYear(holiday.date); // Usar mes y año locales
+        if (!acc[monthYear]) {
+            acc[monthYear] = [];
+        }
+        acc[monthYear].push(holiday);
+        return acc;
+    }, {});
+};
+
+// Función para convertir el formato "AAAA-MM" a "mes de AAAA"
+const formatMonthYear = (monthYear) => {
+    const [year, month] = monthYear.split('-');
+    const date = new Date(year, month - 1, 1); // Asegurarse de que la fecha sea el primer día del mes
+    return date.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+};
+
+// Evento DOMContentLoaded para cargar los feriados en la pestaña "Holidays"
+document.addEventListener('DOMContentLoaded', async () => {
+    const holidaysContainer = document.getElementById('holidays-list');
+
+    if (!holidaysContainer) {
+        console.error('El contenedor de feriados no existe en el DOM.');
+        return;
+    }
+
+    // Obtener y procesar los feriados
+    const holidays = await getHolidays();
+    const groupedHolidays = groupHolidaysByMonth(holidays);
+
+    // Ordenar los meses
+    const sortedMonths = Object.keys(groupedHolidays).sort();
+
+    // Mostrar los feriados agrupados por mes
+    sortedMonths.forEach(monthYear => {
+        const monthElement = document.createElement('h2');
+        monthElement.textContent = formatMonthYear(monthYear); // Formatear como "mes de AAAA"
+        holidaysContainer.appendChild(monthElement);
+
+        const ulElement = document.createElement('ul');
+        groupedHolidays[monthYear].forEach(holiday => {
+            const holidayElement = document.createElement('li');
+            holidayElement.textContent = `${holiday.date.toISOString().split('T')[0]} - ${holiday.name}`;
+            ulElement.appendChild(holidayElement);
+        });
+
+        holidaysContainer.appendChild(ulElement);
+    });
+});
+
+//------------------------Para que quede seleccionada la opcion del Sidebar
+const sidebarItems = document.querySelectorAll('.sidebar li');
+
+    sidebarItems.forEach(item => {
+        item.addEventListener('click', function() {
+            // Elimina la clase 'active' de todos los elementos
+            sidebarItems.forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+        });
+    });
+    
+// Función para obtener el rango de fechas de una semana dada
+const getWeekRange = (referenceDate = new Date()) => {
+    const dayOfWeek = referenceDate.getDay();
+    const firstDayOfWeek = referenceDate.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1); // Ajustar si la semana comienza el lunes
+    const lastDayOfWeek = firstDayOfWeek + 6;
+
+    const firstDate = new Date(referenceDate);
+    firstDate.setDate(firstDayOfWeek);
+    const lastDate = new Date(referenceDate);
+    lastDate.setDate(lastDayOfWeek);
+
+    firstDate.setHours(0, 0, 0, 0);
+    lastDate.setHours(23, 59, 59, 999);
+
+    return { firstDate, lastDate };
+};
+
+const updateWeekHeader = (startDate, endDate) => {
+    const weekHeader = document.getElementById('week-header');
+    weekHeader.textContent = `Week of ${startDate.toDateString()} - ${endDate.toDateString()}`;
+};
+
+let currentWeekStartDate = new Date(); // Inicialmente la semana actual
+currentWeekStartDate.setDate(currentWeekStartDate.getDate() - currentWeekStartDate.getDay() + 1); // Ajustar al inicio de la semana
+
+const loadTasksForCurrentWeek = () => {
+    const tasksContainer = document.getElementById('tasks-container');
+    const savedTasks = JSON.parse(localStorage.getItem('calendarTasks')) || {};
+    const { firstDate, lastDate } = getWeekRange(currentWeekStartDate);
+
+    tasksContainer.innerHTML = ''; // Limpiar tareas actuales
+
+    const dateKeys = Object.keys(savedTasks).filter(dateKey => {
+        const [year, month, day] = dateKey.split('-').map(Number);
+        const taskDate = new Date(year, month - 1, day);
+        return taskDate >= firstDate && taskDate <= lastDate;
+    }).sort((a, b) => new Date(a) - new Date(b)); // Ordenar fechas de la más próxima a la más lejana
+
+    dateKeys.forEach(dateKey => {
+        const tasks = savedTasks[dateKey];
+        const [year, month, day] = dateKey.split('-').map(Number);
+        const taskDate = new Date(year, month - 1, day);
+
+        tasks.forEach((task, index) => {
+            const taskElement = document.createElement('div');
+            taskElement.textContent = `${dateKey}: ${task}`;
+            // Crear botón de eliminar
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.className = 'delete-button';
+            deleteButton.onclick = () => {
+                if (confirm(`Are you sure you want to delete this task: "${task}"?`)) {
+                    deleteTask(dateKey, index);
+                }
+            };
+
+            taskElement.appendChild(deleteButton);
+            tasksContainer.appendChild(taskElement);
+        });
     });
 
-    observer.observe(daysContainer, { childList: true });
-});*/
+    updateWeekHeader(firstDate, lastDate);
+};
 
-
+// Asignar eventos a los botones de navegación de semanas
 document.addEventListener('DOMContentLoaded', () => {
+    const prevWeekButton = document.getElementById('prev-week');
+    const nextWeekButton = document.getElementById('next-week');
+
+    prevWeekButton.addEventListener('click', () => {
+        const prevDate = new Date(currentWeekStartDate);
+        prevDate.setDate(prevDate.getDate() - 7); // Ir a la semana anterior
+        currentWeekStartDate = prevDate;
+        loadTasksForCurrentWeek();
+    });
+
+    nextWeekButton.addEventListener('click', () => {
+        const nextDate = new Date(currentWeekStartDate);
+        nextDate.setDate(nextDate.getDate() + 7); // Ir a la siguiente semana
+        currentWeekStartDate = nextDate;
+        loadTasksForCurrentWeek();
+    });
+
     const tabs = document.querySelectorAll('.sidebar .tab');
     const tabContents = document.querySelectorAll('.tab-content');
-    
-//selecciona el día.
-    const getCurrentWeek = () => {
-        const today = new Date();
-        const firstDayOfWeek = today.getDate() - today.getDay(); // Get the first day of the week (Sunday)
-        const lastDayOfWeek = firstDayOfWeek + 6; // Get the last day of the week (Saturday)
-    
-        const firstDate = new Date(today.setDate(firstDayOfWeek));
-        const lastDate = new Date(today.setDate(lastDayOfWeek));
-    
-        return { firstDate, lastDate };
-    };
-
-    const loadTasks = () => {
-        const tasksContainer = document.getElementById('tasks-container');
-        const savedTasks = JSON.parse(localStorage.getItem('calendarTasks')) || {};
-        const { firstDate, lastDate } = getCurrentWeek(); 
-        tasksContainer.innerHTML = ''; // Limpiar tareas actuales
-
-        Object.keys(savedTasks).forEach(dateKey => {
-            const tasks = savedTasks[dateKey];
-            const [year, month, day] = dateKey.split('-').map(Number);
-            const taskDate = new Date(year, month - 1, day);
-
-            tasks.forEach((task, index) => {
-                const taskElement = document.createElement('div');
-                taskElement.textContent = `${dateKey}: ${task}`;
-                // Crear botón de eliminar
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Delete';
-                deleteButton.className = 'delete-button';
-                deleteButton.onclick = () => {
-                    if (confirm(`Are you sure you want to delete this task: "${task}"?`)) {
-                        deleteTask(dateKey, index);
-                    }
-                };
-                
-                taskElement.appendChild(deleteButton);
-
-                // Destacar las tareas de la semana actual
-                if (taskDate >= firstDate && taskDate <= lastDate) {
-                    taskElement.classList.add('week-task');
-                    tasksContainer.insertBefore(taskElement, tasksContainer.firstChild); // Insertar al principio
-                } else {
-                    tasksContainer.appendChild(taskElement);
-                }
-            });
-        });
-    };
-
-    
-
-    const deleteTask = (dateKey, taskIndex) => {
-        const savedTasks = JSON.parse(localStorage.getItem('calendarTasks')) || {};
-        savedTasks[dateKey].splice(taskIndex, 1); // Eliminar tarea
-    
-        // Si no quedan tareas para esa fecha, eliminarla del objeto y actualizar el calendario
-        if (savedTasks[dateKey].length === 0) {
-            delete savedTasks[dateKey]; // Eliminar la fecha del objeto
-            
-            // Actualizar visualmente el día en el calendario
-            const [year, month, day] = dateKey.split('-').map(Number);
-            const dayElements = document.querySelectorAll('.days li');
-    
-            dayElements.forEach(dayElement => {
-                if (!dayElement.classList.contains('inactive') && parseInt(dayElement.textContent) === day) {
-                    dayElement.classList.remove('has-event'); // Quitar subrayado
-                }
-            });
-        }
-    
-        // Guardar los cambios en localStorage y recargar las tareas
-        localStorage.setItem('calendarTasks', JSON.stringify(savedTasks));
-        loadTasks(); // Recargar tareas visibles en la pestaña de tareas
-        disablePastDays(); // Actualizar las clases de los días en el calendario
-    };
-    
-    // Función para mostrar tareas disponibles para eliminar y devolver índice de la seleccionada
-    function promptTasksForDeletion(tasks) {
-        const taskList = tasks
-            .map((task, index) => `${index + 1}. ${task}`)
-            .join("\n");
-        const taskIndex = prompt(`Select a task to delete:\n\n${taskList}`);
-        if (taskIndex && !isNaN(taskIndex) && taskIndex > 0 && taskIndex <= tasks.length) {
-            return parseInt(taskIndex, 10) - 1; // Convertir a índice basado en cero
-        }
-        return null;
-    }
 
     tabs.forEach(tab => {
         tab.addEventListener('click', (event) => {
-            // Ocultar todas las secciones
-            tabContents.forEach(content => {
-                content.classList.remove('active');
-                content.style.display = 'none';
-            });
+            tabContents.forEach(content => content.classList.remove('active'));
+            tabContents.forEach(content => content.style.display = 'none');
 
-            // Mostrar la sección correspondiente
             const tabName = event.target.getAttribute('data-tab');
             const tabContent = document.getElementById(tabName);
             tabContent.classList.add('active');
             tabContent.style.display = 'block';
 
-            // Ejecutar acciones específicas para la pestaña "Tasks"
             if (tabName === 'tasks') {
-                loadTasks();
+                loadTasksForCurrentWeek();
             }
         });
     });
 
-    // Asegurarse de que la sección Dashboard se muestre inicialmente
-    document.getElementById('dashboard').classList.add('active');
-    disablePastDays();
+    // Mostrar tareas de la semana actual al cargar la página
+    loadTasksForCurrentWeek();
 });
+
+const deleteTask = (dateKey, taskIndex) => {
+    const savedTasks = JSON.parse(localStorage.getItem('calendarTasks')) || {};
+    savedTasks[dateKey].splice(taskIndex, 1); // Eliminar tarea
+
+    // Si no quedan tareas para esa fecha, eliminarla del objeto y actualizar el calendario
+    if (savedTasks[dateKey].length === 0) {
+        delete savedTasks[dateKey]; // Eliminar la fecha del objeto
+        
+        // Actualizar visualmente el día en el calendario
+        const [year, month, day] = dateKey.split('-').map(Number);
+        const dayElements = document.querySelectorAll('.days li');
+
+        dayElements.forEach(dayElement => {
+            if (!dayElement.classList.contains('inactive') && parseInt(dayElement.textContent) === day) {
+                dayElement.classList.remove('has-event'); // Quitar subrayado
+            }
+        });
+    }
+
+    // Guardar los cambios en localStorage y recargar las tareas
+    localStorage.setItem('calendarTasks', JSON.stringify(savedTasks));
+    loadTasksForCurrentWeek(); // Recargar tareas visibles en la pestaña de tareas
+    disablePastDays(); // Actualizar las clases de los días en el calendario
+};

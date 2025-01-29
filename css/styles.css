@@ -79,6 +79,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow-y: auto;
 }
 
 /* Cabecera con temas */
@@ -324,7 +325,9 @@ body {
 }
 
 #tasks-container {
-    max-height: 50vh; /* Ajusta el tamaño máximo del contenedor de tareas */
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh; /* Ajusta el tamaño máximo del contenedor de tareas */
     overflow-y: auto; 
 }
 
@@ -355,4 +358,39 @@ body {
     border-left: 4px solid #0078d4; /* Color de borde */
     padding: 8px;
     margin-bottom: 5px;
+}
+
+/* Formato para holidays*/
+#holidays-list {
+    margin: 0;
+    padding: 0;
+}
+
+#holidays-list h2 {
+    background-color: var(--primary-color);
+    color: var(--primary-text-color);
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+#holidays-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+#holidays-list ul li {
+    padding: 8px;
+    margin: 5px 0;
+    background-color: var(--primary-light-color);
+    color: var(--secundary-text-color);
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+}
+
+#holidays-list ul li:hover {
+    background-color: var(--primary-hover-color);
 }
