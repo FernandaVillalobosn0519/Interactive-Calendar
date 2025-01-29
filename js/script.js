@@ -203,84 +203,6 @@ document.addEventListener('DOMContentLoaded', () => {
     disablePastDays();
 });
 
-
-
-/*Buscando las tareas- no gunciona aún pero tratamos.
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.querySelector('.search input[type="text"]');
-    const searchButton = document.querySelector('.search-button');
-    const daysContainer = document.querySelector('.days');
-    const currentDateElement = document.querySelector('.current-date');
-
-
-    // mes y año actual.
-    const getDisplayedMonthAndYear = () => {
-        const [monthName, year] = currentDateElement.textContent.split(' ');
-        const displayedMonth = new Date(`${monthName} 1, ${year}`).getMonth();
-        const displayedYear = parseInt(year);
-        return { displayedMonth, displayedYear };
-    };
-
-    // palabra clave.
-    const searchTasks = () => {
-        const query = searchInput.value.trim().toLowerCase();
-        if (!query) {
-            alert('Please enter a date (YYYY-MM-DD) or a keyword to search.');
-            return;
-        }
-
-        const { displayedMonth, displayedYear } = getDisplayedMonthAndYear();
-
-        // Si la consulta es una fecha en formato YYYY-MM-DD
-        if (/^\d{4}-\d{2}-\d{2}$/.test(query)) {
-            const [year, month, day] = query.split('-').map(Number);
-
-
-            if (year === displayedYear && month - 1 === displayedMonth) {
-                const dayElement = [...daysContainer.querySelectorAll('li')].find(
-                    (li) => parseInt(li.textContent) === day
-                );
-
-                if (dayElement) {
-                    daysContainer.querySelectorAll('li').forEach((li) => li.classList.remove('highlight'));
-                    dayElement.classList.add('highlight');
-                    dayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                } else {
-                    alert('No tasks found for the specified date.');
-                }
-            } else {
-                alert('The date is not in the current calendar view.');
-            }
-        } else {
-            const dayElements = daysContainer.querySelectorAll('li');
-            let found = false;
-
-            dayElements.forEach((dayElement) => {
-                const tasks = [...dayElement.querySelectorAll('.task')];
-                tasks.forEach((task) => {
-                    if (task.textContent.toLowerCase().includes(query)) {
-                        dayElement.classList.add('highlight');
-                        found = true;
-                    }
-                });
-            });
-
-            if (!found) {
-                alert('No tasks found matching the keyword.');
-            }
-        }
-    };
-
-    // clic bsuqeuda.
-    searchButton.addEventListener('click', searchTasks);
-
-    const observer = new MutationObserver(() => {
-        daysContainer.querySelectorAll('li').forEach((li) => li.classList.remove('highlight'));
-    });
-
-    observer.observe(daysContainer, { childList: true });
-});*/
-
 document.addEventListener('DOMContentLoaded', () => {
     const tabs = document.querySelectorAll('.sidebar .tab');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -376,4 +298,93 @@ document.addEventListener('DOMContentLoaded', () => {
     disablePastDays();
 });
 
+// Obtener los días festivos
+const getHolidays = async () => {
+    const apiKey = 'gxtebsMEUnth8jqb7t6ZcsApKxo2L5G9'; // Tu API key
+    const country = 'PE'; // Código de país para Perú
+    const year = 2025; // Año específico
+
+    const url = `https://calendarific.com/api/v2/holidays?api_key=${apiKey}&country=${country}&year=${year}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Error de red: ${response.status}`);
+        }
+        const data = await response.json();
+
+        if (data.response && data.response.holidays) {
+            // Convertir las fechas y retornar los feriados
+            return data.response.holidays.map(holiday => ({
+                date: new Date(holiday.date.iso), // Convertir a objeto Date
+                name: holiday.name
+            }));
+        } else {
+            throw new Error('Formato de respuesta inesperado');
+        }
+    } catch (error) {
+        console.error('Error al obtener los días festivos:', error);
+        return [];
+    }
+};
+
+// Función para obtener el mes y año locales de una fecha
+const getLocalMonthYear = (date) => {
+    // Usamos la fecha ISO para evitar modificaciones de zona horaria
+    const isoDate = date.toISOString().split('T')[0]; // Formato "AAAA-MM-DD"
+    const [year, month] = isoDate.split('-'); // Extraemos año y mes
+    return `${year}-${month}`; // Formato "AAAA-MM"
+};
+
+// Función para agrupar los feriados por mes
+const groupHolidaysByMonth = (holidays) => {
+    return holidays.reduce((acc, holiday) => {
+        const monthYear = getLocalMonthYear(holiday.date); // Usar mes y año locales
+        if (!acc[monthYear]) {
+            acc[monthYear] = [];
+        }
+        acc[monthYear].push(holiday);
+        return acc;
+    }, {});
+};
+
+// Función para convertir el formato "AAAA-MM" a "mes de AAAA"
+const formatMonthYear = (monthYear) => {
+    const [year, month] = monthYear.split('-');
+    const date = new Date(year, month - 1, 1); // Asegurarse de que la fecha sea el primer día del mes
+    return date.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+};
+
+// Evento DOMContentLoaded para cargar los feriados en la pestaña "Holidays"
+document.addEventListener('DOMContentLoaded', async () => {
+    const holidaysContainer = document.getElementById('holidays-list');
+
+    if (!holidaysContainer) {
+        console.error('El contenedor de feriados no existe en el DOM.');
+        return;
+    }
+
+    // Obtener y procesar los feriados
+    const holidays = await getHolidays();
+    const groupedHolidays = groupHolidaysByMonth(holidays);
+
+    // Ordenar los meses
+    const sortedMonths = Object.keys(groupedHolidays).sort();
+
+    // Mostrar los feriados agrupados por mes
+    sortedMonths.forEach(monthYear => {
+        const monthElement = document.createElement('h2');
+        monthElement.textContent = formatMonthYear(monthYear); // Formatear como "mes de AAAA"
+        holidaysContainer.appendChild(monthElement);
+
+        const ulElement = document.createElement('ul');
+        groupedHolidays[monthYear].forEach(holiday => {
+            const holidayElement = document.createElement('li');
+            holidayElement.textContent = `${holiday.date.toISOString().split('T')[0]} - ${holiday.name}`;
+            ulElement.appendChild(holidayElement);
+        });
+
+        holidaysContainer.appendChild(ulElement);
+    });
+});
 
