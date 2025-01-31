@@ -461,15 +461,6 @@ input:focus + .evento, input:valid + .evento{
     border-radius: 5px;
     overflow: auto;
 }
-/*
-.week-task {
-    border: 20px solid rgb(21, 33, 126);
-
-    background-color: #f0f0f0;
-    border-left: 4px solid #0078d4;
-    padding: 8px;
-    margin-bottom: 5px;
-}*/
 
 .dashboar{
     display: block;
@@ -482,16 +473,23 @@ input:focus + .evento, input:valid + .evento{
 .tab-content.active {
     display: block;
 }
-/* Formato para holidays*/
-#holidays-list{
-    border: 2px solid rgb(18, 3, 3);
 
+#feriados{
+    width: 82%;
+    padding: 0 20px;
+    position: absolute;
+    right: 0;
+}
+
+Formato para holidays
+#holidays-list{
+    border: 2px solid rgb(137, 69, 69);
+    width: 82%;
     margin: 0;
     padding: 0;
 }
 
 #holidays-list h2 {
-    border: 2px solid red;
 
     background-color: var(--primary-color);
     color: var(--primary-text-color);
@@ -500,19 +498,16 @@ input:focus + .evento, input:valid + .evento{
     border-radius: 5px;
     text-align: center;
     font-size: 1.5em;
+    text-transform: capitalize;
 }
 
 #holidays-list ul {
-    border: 2px solid red;
-
     list-style: none;
     padding: 0;
     margin: 10px 0;
 }
 
 #holidays-list ul li {
-    border: 2px solid red;
-
     padding: 8px;
     margin: 5px 0;
     background-color: var(--primary-light-color);
@@ -522,7 +517,5 @@ input:focus + .evento, input:valid + .evento{
 }
 
 #holidays-list ul li:hover {
-    border: 2px solid red;
-
-    background-color: var(--primary-hover-color);
+    background-color: var(--secundary-pointer-shadow-color);
 }
