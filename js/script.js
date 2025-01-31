@@ -333,7 +333,7 @@ const getWeekRange = (referenceDate = new Date()) => {
 
 const updateWeekHeader = (startDate, endDate) => {
     const weekHeader = document.getElementById('week-header');
-    weekHeader.textContent = `Week of ${startDate.toDateString()} - ${endDate.toDateString()}`;
+    weekHeader.textContent = `${startDate.toDateString()} - ${endDate.toDateString()}`;
 };
 
 let currentWeekStartDate = new Date(); // Inicialmente la semana actual

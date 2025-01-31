@@ -32,80 +32,65 @@
 }
 
 body {
-    margin: 0;
-    display: flex;
     height: 100vh;
-    background-color: var(--base-color);
-}
-
-.container {
-    display: flex;
     width: 100%;
-    height: 100%;
+    display: flex;
+    background-color: var(--base-color);
 }
 
 /* Sidebar */
 .sidebar {
-    width: 20%;
+    width: 18%;
+    height: 100%;
     background-color:var(--primary-color);
     color: var(--secundary-text-color);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 18px;
+    position: fixed;
 }
 
 .sidebar ul {
     list-style: none;
-    padding: 0;
     width: 100%;
+    height: 100%;
+    padding-top: 60px;
     text-align: left;
+    position: relative;
 }
 
 .sidebar li {
-    padding: 15px 20px;
+    font-weight: 600;
+    padding: 15px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    margin: 20px 0;
+    transition: background-color 0.2s ease;
 }
 
 .sidebar li.active, .sidebar li:hover {
     background-color: var(--primary-pointer-shadow-color);
 }
 
-/* Contenido principal */
-.main-content {
-    flex: 1;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow-y: auto;
-}
-
-/* Cabecera con temas */
-.header {
-    display: flex;
-    justify-content: flex-end;
-    gap: 5px;
-    margin-bottom: 2px;
-}
-
 /*Cambio de color a dark mode*/
 #theme-switch{
-    height: 50px;
-    width: 50px;
-    padding: 0;
+    border: 2px solid var(--primary-pointer-shadow-color);
+    margin: 20px 0;
     border-radius: 50%;
-    background-color: var(--primary-color);
+    background-color: var(--primary-pointer-shadow-color);
     display: flex;
     justify-content: center;
     align-items: center;
-    position: fixed;
-    top: 20px;
-    right: 20px;
+    position: absolute;
+    left: 39%;
+    top: 0px;
+    cursor: pointer;
 }
+
 #theme-switch svg{
-    fill: var(--secundary-color);
+    fill: var(--base-color);
+    width: 40px;
+    height: 40px;
+    padding: 11px;
 }
 #theme-switch svg:last-child{
     display: none;
@@ -117,72 +102,72 @@ body {
     display: block;
 }
 
-.icon, .add {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.icon input, .add input {
-    flex: 1;
-    padding: 10px;
-    border: 2px solid var(--primary-color); 
-    border-radius: 5px;
-}
-
-.search-button, .add-button {
-    padding: 4px 10px;
+/* Mostrar el Dashboard por defecto */
+#dashboard {
     border: none;
-    border-radius: 4px;
-    background-color: var(--primary-color);
-    color: var(--base-color);
-    font-size: 15px;
-    cursor: pointer;
-    transition: background-color 0.1s ease;
-}
-
-.search-button:hover, .add-button:hover {
-    background-color: var(--primary-pointer-shadow-color);
+    flex: 1;
+    padding: 20px;
+    height: 100%;
+    width: 82%;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    right: 0;
 }
 
 /* Calendario */
 .wrapper { 
-    width: 100%; 
+    margin-top: 20px;
+    margin-bottom: 50px;
+    width: 100%;
+    height: 545px;
     background: var(--secundary-color); 
     border-radius: 15px; 
-    box-shadow: 0 15px 40px var(--tertiary-color);
-    margin-top: 15px; 
+    box-shadow: 0 15px 25px var(--tertiary-color);
 }
 
 .wrapper header { 
+    height: 15%;
     display: flex; 
     align-items: center; 
-    padding: 20px 30px 10px; 
-    justify-content: space-between; 
+    padding: 40px 30px 20px; 
+    justify-content: space-between;
+    position: relative;
 }
 
-.current-date { 
+.current-date {
+    position: absolute;
+    left: 60px;
+    width: 30%;
     color: var(--primary-text-color);
     cursor: default; 
-    font-size: 1.45rem; 
-    font-weight: 450; 
+    font-size: 1.7rem; 
+    font-weight: 650;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .icons { 
-    display: flex; 
+    position: absolute;
+    right: 80px;
+    width: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow: visible;
 }
 
 .icons span { 
-    height: 38px; width: 38px; 
-    margin: 0 1px; 
+    height: 45px; 
+    width: 45px; 
+    margin: 5px 10px;
     cursor: pointer; 
-    color: var(--tertiary-color); 
-    text-align: center; 
-    line-height: 38px; 
-    font-size: 2rem; 
-    user-select: none; 
+    color: var(--tertiary-color);
+    padding: 2px 3px;
+    font-size: 2.4rem; 
     border-radius: 50%; 
-    transition: 0.1s; 
+    transition: 0.2s;
 }
 
 .icons span:hover { 
@@ -191,45 +176,60 @@ body {
 }
 
 .calendar { 
+    height: 85%;
     padding: 15px; 
 }
 
 .calendar ul { 
+    height: 10%;
     display: flex; 
     flex-wrap: wrap; 
-    list-style: none; 
-    text-align: center; 
+    list-style: none;
+    text-align: center;  
 }
 
 .calendar li { 
-    color: var(--secundary-text-color); 
-    width: calc(95% / 7); 
-    font-size: 1.1rem; 
+    padding-top: 3px;
+    color: var(--secundary-text-color);
+    width: calc(100% / 7); 
+    font-size: 1.3rem;
     cursor: default; 
 }
 
-.calendar .weeks li { 
-    font-weight: 500; 
+.calendar .weeks{ 
+    font-weight: 600; 
 }
 
 .calendar .days { 
-    margin-bottom: 20px; 
+    height: 90%;
 }
 
 .calendar .days li { 
+    width: calc(100% / 7);
+    height: calc(100% / 6);
+    align-content: space-around;
     z-index: 1; 
     cursor: pointer; 
-    position: relative; 
-    margin-top: 23px; 
-    font-weight: 440; 
+    position: relative;
+    font-weight: 400;
+    color: var(--primary-text-color) !important;
+    border: none;
 }
 
 .days li.inactive { 
-    color: var(--tertiary-color); 
+    color: var(--secundary-color) !important;
+}
+
+.days li.inactive::before{
+    background-color: var(--secundary-pointer-shadow-color);
 }
 
 .days li.active { 
-    color: var(--base-color); 
+    color: var(--base-color) !important; /*colo numero hoy*/
+} 
+
+.days li.active::before { 
+    background: var(--today-color); 
 } 
 
 .days li::before { 
@@ -237,136 +237,262 @@ body {
     content: ""; 
     left: 50%; 
     top: 50%; 
-    height: 40px; 
-    width: 40px; 
+    height: 45px; 
+    width: 45px; 
     z-index: -1; 
     border-radius: 50%; 
     transform: translate(-50%, -50%); 
 }
 
-.days li.active::before { 
-    background: var(--today-color); 
-} 
-
 .days li:not(.active):hover::before { 
-    background: var(--secundary-pointer-shadow-color); 
+    background: var(--secundary-pointer-shadow-color);
 }
 
 /* Día seleccionado */
 .days .selected {
-    background-color: #f0f8ff;
-    border: 2px solid #1e90ff;
-    border-radius: 5px;
-    padding: 5px;
+    background: var(--secundary-pointer-shadow-color);
+    border-radius: 15px;
+    animation: alternate;
+}
+
+.add {
+    display: flex;
+    justify-content: space-around;
+}
+
+.addTask, .event{
+    position: relative;
+    width: 35%;
+    height: 35px;
+    margin: 5px;
+    line-height: 35px;
+    display: flex;
+    align-items: center;
+}
+
+#task-input, #event-description{
+    position: absolute;
+    width: 100%;
+    outline: none;
+    padding: 0 15px;
+    font-size: 1rem;
+    line-height: 40px;
+    border-radius: 10px;
+    border: 2.3px solid var(--primary-color);
+    background: transparent;
+    transition: 0.1s ease;
+    z-index: 1111;
+}
+
+.tarea, .evento{
+    position: absolute;
+    height: 35px;
+    font-size: 0.7rem;
+    color: var(--secundary-text-color);
+    padding: 0 15px;
+    margin: 0 10px;
+    background-color: var(--base-color);
+    transition: 0.1s ease;
+}
+
+input:focus, input:valid{
+    color: var(--secundary-text-color);
+}
+
+input:focus + .tarea, input:valid + .tarea,
+input:focus + .evento, input:valid + .evento{
+    color: var(--secundary-text-color);
+    padding: 0 9px;
+    transform: translate(0px, -22px) scale(0.8);
+    z-index: 1111;
+}
+
+.addTime{
+    position: relative;
+    width: 20%;
+    margin: 5px;
+    display: flex;
+    align-items: center;
+}
+
+#event-time{
+    height: 45px;
+    width: 100%;
+    position: absolute;
+    border-radius: 10px;
+    border: 2.3px solid var(--primary-color);
+    background: transparent;
+    padding: 0 30px;
+    outline: none;
+    font-size: 1.2rem;
+}
+
+#add-task-button{
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    border: 2.3px solid var(--primary-color);
+    background-color: var(--secundary-color);
+    box-shadow: 0 5px 10px var(--tertiary-color);
+    border-radius: 50%;
+    cursor: pointer;
 }
 
 /* Estilo de las tareas */
-.task {
+.task-tab{
+    height: 100%;
+    padding-left: 2.3%;
+    width: 82%;
+    position: absolute;
+    align-content: center;
+    right: 0;
+}
+
+#week-navigation{
     display: flex;
-    justify-content: space-between;
+    height: 11%;
+    padding: 0 20px 20px;
+    justify-content: center;
     align-items: center;
-    background-color: #f0f8ff;
-    padding: 5px 10px;
-    margin: 5px 0;
+    position: relative;
+}
+
+#week-navigation button{
+    display: flex;
+    margin-top: 20px;
+    padding: 8px;
+    width: 100px;
+    justify-content: center;
+    align-items: center;
     border-radius: 5px;
-    font-size: 0.9rem;
-    color: #1e90ff;
-}
-
-.task .delete-task {
-    background-color: #ff4d4d;
+    background-color: var(--primary-color);
     border: none;
-    color: white;
-    padding: 3px 7px;
-    font-size: 0.8rem;
-    border-radius: 3px;
+    color: var(--secundary-text-color);
+    font-weight: 600;
     cursor: pointer;
+    font-size: large;
 }
 
-.task .delete-task:hover {
-    background-color: #e60000;
+#week-navigation button:hover{
+    background-color: var(--secundary-pointer-shadow-color);
 }
 
+#prev-week{
+    position: absolute;
+    left: 40px;
+}
 
-#delete-task-button {
-    background-color: #f44336;
-    color: white;
+#next-week{
+    position: absolute;
+    right: 80px;
+}
+
+#semanas{
+    position: absolute;
+    top: 10px;
+    color: var(--primary-text-color);
+    text-transform: capitalize;
+    font-size: 27px;
+    font-weight: 650;
+}
+
+#week-header{
+    padding: 0 20px;
+    width: 50%;
+    margin-top: 60px;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+    color: var(--primary-text-color);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+#tasks-container { /*borde*/
+    width: 97%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 80vh; /* Ajusta el tamaño máximo del contenedor de tareas */
+    margin-top: 15px;
+}
+
+.delete-button {
+    background-color: var(--primary-color); /*color boton delete*/
     border: none;
+    color: var(--primary-text-color); /*color texto boton*/
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
-    margin-left: 10px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    right: 0;
+    float: right;
 }
 
-#delete-task-button:hover {
-    background-color: #d32f2f;
-}
-
-/* Ocultar todas las secciones por defecto */
-.tab-content {
-    display: none;
-}
-
-/* Mostrar la sección activa */
-.tab-content.active {
-    display: block;
-}
-
-/* Mostrar el Dashboard por defecto */
-#dashboard {
-    display: block;
+.delete-button:hover {
+    border: none;
+    background-color: var(--primary-pointer-shadow-color);
 }
 
 /* Estilo para días con eventos */
 .has-event {
-    text-decoration: underline;
-    text-decoration-color: red; /* Color de subrayado rojo */
-}
-
-#tasks-container {
-    display: flex;
-    flex-direction: column;
-    max-height: 80vh; /* Ajusta el tamaño máximo del contenedor de tareas */
-    overflow-y: auto; 
+    text-decoration: underline 3px;
+    text-decoration-color: var(--today-color); /* Color de subrayado rojo */
 }
 
 #tasks-container > div {
+    width: 100%;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 2px solid var(--primary-pointer-shadow-color);
+    background-color: var(--secundary-color);
+    box-shadow: 0 5px 5px var(--tertiary-color);
     margin-bottom: 10px;
     border-radius: 5px;
+    overflow: auto;
 }
-
-.delete-button {
-    float: right;
-    margin-left: 10px;
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.delete-button:hover {
-    background-color: darkred;
-}
-
+/*
 .week-task {
+    border: 20px solid rgb(21, 33, 126);
+
     background-color: #f0f0f0;
-    border-left: 4px solid #0078d4; /* Color de borde */
+    border-left: 4px solid #0078d4;
     padding: 8px;
     margin-bottom: 5px;
-}
+}*/
 
+.dashboar{
+    display: block;
+}
+/* Ocultar todas las secciones por defecto */
+.tab-content {
+    display: none;
+}
+/* Mostrar la sección activa */
+.tab-content.active {
+    display: block;
+}
 /* Formato para holidays*/
-#holidays-list {
+#holidays-list{
+    border: 2px solid rgb(18, 3, 3);
+
     margin: 0;
     padding: 0;
 }
 
 #holidays-list h2 {
+    border: 2px solid red;
+
     background-color: var(--primary-color);
     color: var(--primary-text-color);
     padding: 10px;
@@ -377,12 +503,16 @@ body {
 }
 
 #holidays-list ul {
+    border: 2px solid red;
+
     list-style: none;
     padding: 0;
     margin: 10px 0;
 }
 
 #holidays-list ul li {
+    border: 2px solid red;
+
     padding: 8px;
     margin: 5px 0;
     background-color: var(--primary-light-color);
@@ -392,5 +522,7 @@ body {
 }
 
 #holidays-list ul li:hover {
+    border: 2px solid red;
+
     background-color: var(--primary-hover-color);
 }
